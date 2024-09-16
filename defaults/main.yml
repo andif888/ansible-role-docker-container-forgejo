@@ -1,0 +1,190 @@
+---
+# defaults file for ansible-role-docker-container-forgejo
+
+# ------------
+# Docker image
+# ------------
+
+# @var docker_image_forgejo_name:description: Repository path and tag for the container image.
+docker_image_forgejo_name: "codeberg.org/forgejo/forgejo:7"
+
+# @var docker_image_forgejo_pull:description: Indicate to always pull the docker image.
+docker_image_forgejo_pull: false
+
+# ----------------
+# Docker container
+# ----------------
+
+# @var docker_container_forgejo_name:description: Name for the container
+docker_container_forgejo_name: "forgejo"
+
+# @var docker_container_forgejo_image:description: >
+# Repository path and tag used to create the container. 
+# If an image is not found or pull is true, the image will be pulled from the registry. 
+# If no tag is included, latest will be used.
+# @end
+docker_container_forgejo_image: "{{ docker_image_forgejo_name }}"
+
+# @var docker_container_forgejo_volume_dir:description: >
+# Volume mount host directory, where Treafik config files are stored.
+# @end
+docker_container_forgejo_volume_dir: "{{ docker_container__base__volume_dir }}/{{ docker_container_forgejo_name }}"
+
+# @var docker_container_forgejo_env:description: >
+# Dictionery of key,value pairs for docker 
+# environment variables to configure forgejo. 
+# 
+# Example:
+#
+# ```yaml
+#
+# docker_container_forgejo_env:
+#
+#   forgejo__mailer__ENABLED: "false"
+#
+# ```
+# @end
+docker_container_forgejo_env: {}
+
+# @var docker_container_forgejo_volumes:description: >
+# List of volumes to mount within the container.
+# @end
+docker_container_forgejo_volumes:
+  - "{{ docker_container_forgejo_volume_dir }}/data:/data"
+  - "/etc/timezone:/etc/timezone:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+
+# @var docker_container_forgejo_labels:description: >
+# Dictionary of key value pairs for container labels. 
+# 
+# Example:
+#
+# ```yaml
+# 
+# docker_container_forgejo_labels:
+#
+#   traefik.enable: "true"
+# 
+# ```
+# 
+# @end
+docker_container_forgejo_labels: {}
+
+# @var docker_container_forgejo_networks:description: >
+# List of networks the container belongs to.
+# @end
+docker_container_forgejo_networks:
+  - name: "{{ docker_network_forgejo_name }}"
+
+# @var docker_container_forgejo_ports:description: >
+# List of ports to publish from the container to the host.
+# @end
+docker_container_forgejo_ports:
+  - "3000:3000"
+
+# @var docker_container_forgejo_comparisons:description: >
+# Allows to specify how properties of existing containers are compared with module options 
+# to decide whether the container should be recreated / updated or not.
+# @end
+docker_container_forgejo_comparisons:
+  image: strict
+  env: strict
+  volumes: strict
+
+# docker_container_forgejo_auto_remove: no 
+# docker_container_forgejo_detach: yes 
+# docker_container_forgejo_env_file: "{{ docker_container_forgejo_volume_dir }}/.env"
+# docker_container_forgejo_init: no 
+# docker_container_forgejo_interactive: no 
+# docker_container_forgejo_keep_volumes: yes
+# docker_container_forgejo_memory: "0"
+# docker_container_forgejo_paused: no 
+# docker_container_forgejo_privileged: no 
+# docker_container_forgejo_pull: no
+# docker_container_forgejo_read_only: no 
+# docker_container_forgejo_recreate: no
+# docker_container_forgejo_restart: no
+# docker_container_forgejo_restart_policy: always 
+# docker_container_forgejo_state: started
+# docker_container_forgejo_tty: no 
+# docker_container_forgejo_networks_cli_compatible: yes 
+
+# --------------
+# Docker network
+# --------------
+
+# @var docker_network_forgejo_name:description: >
+# Name of the docker network created for forgejo.
+# @end
+docker_network_forgejo_name: "{{ docker_container_forgejo_name }}_backend"
+# docker_network_forgejo_driver: bridge
+# docker_network_forgejo_attachable: yes
+# docker_network_forgejo_enable_ipv6: no
+# docker_network_forgejo_internal: no
+
+# -------------
+# Restic Backup
+# -------------
+# @var docker_container_forgejo_restic_enable:description: >
+# Enable restic backup for the container's mounted volumes.
+# @end
+docker_container_forgejo_restic_enable: false
+
+# @var docker_container_forgejo_restic_s3_endpoint:description: >
+# Minio S3 endpoint for restic backup storage.
+#
+# Example: 
+# 
+# ```yaml
+#
+# docker_container__base__restic_s3_endpoint: "https://minio.{{ dns_domain }}"
+#
+# docker_container_forgejo_restic_s3_endpoint: "{{ docker_container__base__restic_s3_endpoint }}"
+#
+# ```
+#
+# @end
+docker_container_forgejo_restic_s3_endpoint: "{{ docker_container__base__restic_s3_endpoint }}"
+
+# @var docker_container_forgejo_restic_s3_bucket_name:description: >
+# Minio S3 bucket name for restic backup storage.
+# @end
+docker_container_forgejo_restic_s3_bucket_name: "restic-{{ docker_container_forgejo_name }}"
+
+# @var docker_container_forgejo_restic_s3_repo:description: >
+# Minio S3 repo URL for restic backup storage.
+# @end
+docker_container_forgejo_restic_s3_repo: "s3:{{ docker_container_forgejo_restic_s3_endpoint }}/{{ docker_container_forgejo_restic_s3_bucket_name }}"
+
+# @var docker_container_forgejo_restic_s3_repo_password:description: >
+# Minio S3 repo password for restic backup storage.
+# @end
+docker_container_forgejo_restic_s3_repo_password: "{{ docker_container__base__restic_s3_repo_password }}"
+
+# @var docker_container_forgejo_restic_s3_repo_access_key:description: >
+# Minio S3 repo access key for restic backup storage.
+# @end
+docker_container_forgejo_restic_s3_repo_access_key: "{{ docker_container__base__restic_s3_repo_access_key }}"
+# @var docker_container_forgejo_restic_s3_repo_secret_key:description: >
+# Minio S3 repo secret key for restic backup storage.
+# @end
+docker_container_forgejo_restic_s3_repo_secret_key: "{{ docker_container__base__restic_s3_repo_secret_key }}"
+
+# docker_container_forgejo_restic_s3_seed_repo: "s3:{{ docker_container__base__restic_s3_seed_endpoint }}/{{ docker_container_forgejo_restic_s3_bucket_name }}"
+# docker_container_forgejo_restic_s3_seed_repo_password: "{{ docker_container__base__restic_s3_repo_password }}"
+
+# @var docker_container_forgejo_restic_retention:description: >
+# Retention settions for `restic forget` after the `restic backup`.
+# @end
+docker_container_forgejo_restic_retention:
+  keep_last: 1
+  # keep_hourly: 1
+  keep_daily: 7
+  keep_weekly: 4
+  # keep_monthly: 6
+  # keep_yearly
+
+# @var docker_container_forgejo_restic_tag:description: >
+# Tag for the `restic backup` command
+# @end
+docker_container_forgejo_restic_tag: "{{ docker_container_forgejo_name }}"
